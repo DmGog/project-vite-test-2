@@ -1,12 +1,23 @@
 import { Dispatch } from 'redux'
 import { decksAPI, UpdateDeckParams } from './decks-api.ts'
 import { addDeckAC, deleteDeckAC, setDecksAC, updateDeckAC } from './decks-reducer.ts'
+import { setAppError, setAppStatus } from '../../app/app-reducer.ts'
+import { appError } from '../../app/app-selectors.ts'
+import { isAxiosError } from 'axios'
+import { handleError } from '../../common/utils/handle-error.ts'
 
-export const fetchDecksTC = () => (dispatch: Dispatch) => {
-  decksAPI.fetchDecks().then((res) => {
+export const fetchDecksTC = () => async (dispatch: Dispatch) => {
+  dispatch(setAppStatus('loading'))
+  try {
+    const res = await decksAPI.fetchDecks()
     dispatch(setDecksAC(res.data.items))
-  })
+    dispatch(setAppStatus('succeeded'))
+  } catch (error) {
+    console.log('error')
+    dispatch(setAppStatus('failed'))
+  }
 }
+
 
 export const addDeckTC = (name: string) => async (dispatch: Dispatch) => {
   return decksAPI.addDeck(name).then((res) => {
@@ -20,8 +31,12 @@ export const deleteDeckTC = (id: string) => async (dispatch: Dispatch) => {
   })
 }
 
+
 export const updateDeckTC = (params: UpdateDeckParams) => async (dispatch: Dispatch) => {
-  return decksAPI.updateDeck(params).then((res) => {
+  try {
+    const res = await decksAPI.updateDeck(params)
     dispatch(updateDeckAC(res.data))
-  })
+  } catch (err) {
+    handleError(err, dispatch)
+  }
 }

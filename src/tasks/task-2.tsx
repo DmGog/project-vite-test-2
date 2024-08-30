@@ -1,8 +1,9 @@
-type MyComponentProps = {
-  items: any[]
-  defaultItem: any
+type MyComponentProps<D, C> = {
+  items: D[]
+  defaultItem: C
 }
-function MyComponent(props: MyComponentProps) {
+
+function MyComponent<MyComponentProps>(props: MyComponentProps) {
   console.log(props)
   return <p>some content</p>
 }
